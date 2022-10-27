@@ -1,0 +1,141 @@
+@charset "utf-8";
+
+html{
+    font-size: 16px;
+}
+
+body{
+    max-width: 1200px;
+    margin: auto;
+    color: #333333;
+    font-family:"Open Sans",'ヒラギノ角ゴ ProN W3', Hiragino Kaku Gothic ProN, "メイリオ", Meiryo, sans-serif;
+    font-size: 16px;
+}
+ul {
+    list-style: none;
+}
+img{
+    max-width: 100%;
+    height: auto;
+}
+
+/* *********************** */
+.janken{
+    justify-content: center;
+    text-align:center;
+}
+.title_janken{
+    color: red;
+    font-size: 60px;
+    font-weight: bold;
+    /* justify-content: center;
+    text-align:center; */
+    padding: 30px 30px;
+}
+.detail_janken{
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    /* justify-content: center;
+    text-align:center; */
+    padding: 0 30px;
+}
+
+
+/* じゃんけん画像 */
+.janken_image{
+    display: flex;
+    justify-content: center;
+}
+
+.rock{
+    max-width: 200px;
+    padding: 30px 40px 30px 0;
+}
+.scissors{
+    max-width: 200px;
+    padding: 30px 0 30px 0;
+}
+.paper{
+    max-width: 200px;
+    padding: 30px 0 30px 40px;
+}
+
+.title_kekka{
+    color: #333333;
+    font-size: 30px;
+    font-weight: bold;
+    justify-content: center;
+    text-align:center;
+    padding: 30px 30px;
+}
+.kekka{
+    color: #333333;
+    font-size: 30px;
+    font-weight: bold;
+    justify-content: center;
+    text-align:center;
+    padding: 30px 30px;
+}
+.reload{
+    color: #333333;
+    font-size: 20px;
+    font-weight: normal;
+    justify-content: center;
+    text-align:center;
+}
+
+.img_center{
+    display: flex;
+    justify-content: center;
+}
+.imgTest{
+    max-width: 400px;
+    max-height: 280px;
+}
+.revenge{
+    display: flex;
+    justify-content: center;
+    text-align:center;
+}
+.btn-reset{
+    max-width: 150px;
+    max-height: 30px;
+
+}
+
+
+/* .slot {
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+    margin: auto;
+    border : solid 1px #333 ;
+}
+.slot-frame {
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+    border : solid 1px #333 ;
+}
+.reels {
+    width: 100%;
+    position:absolute;
+}
+/* .reels:nth-child(1) {
+    left: 0;
+}
+.reels:nth-child(2) {
+    left: 33%;
+}
+.reels:nth-child(3) {
+    right: 0;
+} */
+/* .reel {
+    height: 270px;
+}
+.reel img {
+    display: block;
+    width: 93%;
+    margin: auto;
+} */ 

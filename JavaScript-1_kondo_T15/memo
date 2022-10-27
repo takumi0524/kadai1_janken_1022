@@ -1,0 +1,475 @@
+// 
+// スロットリール
+// 
+
+(function (global) {
+    "use strict";
+
+    /*
+     * スロットのリール回転速度(実行毎秒数)
+     */
+    var sec = 100;
+
+    /*
+     * スロットのリール情報
+     * ・スロットのリールelement
+     * ・スロットのリール停止フラグ
+     * ・スロットのリール回転数
+     */
+    var $reels       = [],
+        stopReelFlag = [],
+        reelCounts   = [];
+
+    /*
+     * 位置情報
+     */
+    var slotFrameHeight     = 0,
+        slotReelsHeight     = 0,
+        slotReelItemHeight  = 0,
+        slotReelStart       = 0,
+        slotReelStartHeight = 0;
+
+    /**
+     * スロット
+     */
+    var Slot = {
+        /**
+         * 初期化処理
+         */
+        init: function init() {
+            $reels[0] = null;
+            stopReelFlag[0] = false;
+            reelCounts[0] = 0;
+            // $reels[0] = $reels[1] = $reels[2] = null;
+            // stopReelFlag[0] = stopReelFlag[1] = stopReelFlag[2] = false;
+            // reelCounts[0] = reelCounts[1] = reelCounts[2] = 0;
+        },
+        /**
+         * スタートボタンのクリックイベント
+         */
+        start: function () {
+            for (var index = 0; index<1; index++) {
+                Slot.animation(index);
+            }
+        },
+        /**
+         * ストップボタンのクリックイベント
+         */
+        stop: function (index) {
+            stopReelFlag[index] = true;
+            if (stopReelFlag[0] = true) {
+                // 全リール停止したらリセットボタンを押下できるようにする
+                $('.btn-reset').attr('disabled', false);
+            }
+        },
+        /**
+         * 位置情報の初期化処理
+         */
+        resetLocationInfo: function () {
+            slotFrameHeight    = $('.slot-frame').outerHeight();
+            slotReelsHeight    = $('.reels').eq(0).outerHeight();
+            slotReelItemHeight = $('.reel').eq(0).outerHeight();
+            slotReelStart      = 9 - 2;
+            // リールの上下は、半分だけ表示させるための位置調整
+            slotReelStartHeight = -slotReelsHeight;
+            slotReelStartHeight = slotReelStartHeight + slotFrameHeight + ((slotReelItemHeight * 3 / 2) - (slotFrameHeight / 2));
+
+            $('.reels').css({
+                'top':slotReelStartHeight 
+            });
+        },
+        /**
+         * スロットの回転アニメーション
+         */
+        animation: function (index) {
+            console.log('アニメーション', '開始', index);
+            if (reelCounts[index] >= 9  ) {
+                reelCounts[index] = 0;
+            }
+
+            console.log('slotReelStartHeight', slotReelStartHeight);
+            console.log('reelCounts[index]', reelCounts[index]);
+            console.log('slotReelsHeight', slotReelsHeight);
+            console.log('top', slotReelStartHeight + (reelCounts[index] * slotReelItemHeight));
+
+            $('.reels').eq(index).animate({
+                'top': slotReelStartHeight + (reelCounts[index] * slotReelItemHeight)
+            }, {
+                duration: sec,
+                easing: 'linear',
+                complete: function () {
+                    console.log('アニメーション', '完了', index, reelCounts[index]);
+                    if (stopReelFlag[index]) {
+                        console.log('アニメーション', 'ストップ', index, reelCounts[index]);
+                        return ;
+                    }
+                    // 移動階数をカウント
+                    reelCounts[index]++;
+                    // スロット回転のアニメーションを実行する
+                    Slot.animation(index);
+                }
+            });
+        },
+    };
+
+    global.Slot = Slot;
+
+})((this || 0).self || global);
+
+/**
+ * 読み込み後
+ */
+$(document).ready(function () {
+
+    /*
+     * スロットの初期化処理を実行
+     */
+    Slot.init();
+    Slot.resetLocationInfo();
+
+    /**
+     * 【グー】画像のクリックイベント
+     */
+    $('.rock').click(function () {
+        // スタートボタンを押せないようにする
+        $(this).attr('disabled', true);
+        // スロットの回転を開始
+        Slot.start();
+
+
+        setTimeout(function(){
+        // レールの回転を停止
+            Slot.stop($(this).attr('data-val'));
+        },3000);
+        setTimeout(function(){
+        // どの画像を出力するかをランダム関数を使用して決める
+            var random =Math.floor(Math.random()*3);
+            console.log(random,"ランダムな数字");
+        
+            if (random === 0){
+                $(".kekka").text("あいこだよ");
+            }else if (random === 1 ){
+                $(".kekka").text("君の勝ち！");
+            }else if (random === 2 ){
+                $(".kekka").text("君の負け！");
+            }
+            },4000);
+        // ストップボタンを押せるようにする
+        // $('.btn-stop').attr('disabled', false);
+    });
+
+    // const janken_1 = $(".rock");
+    // janken_1.click(function () {
+    //     var random =Math.floor(Math.random()*3);
+    //     console.log(random,"ランダムな数字");
+    
+    //     if (random === 0){
+    //         $(".kekka").text("あいこだよ");
+    //     }else if (random === 1 ){
+    //         $(".kekka").text("君の勝ち！");
+    //     }else if (random === 2 ){
+    //         $(".kekka").text("君の負け！");
+    //     }
+    // });
+
+    /**
+     * リセットボタンのクリックイベント
+     */
+    $('.btn-reset').click(function () {
+        // リセットボタンを押せないようにする
+        $(this).attr('disabled', true);
+        // スタートボタンを押せるようにする
+        $('.btn-start').attr('disabled', false);
+        // // ストップボタンを押せないようにする
+        // $('.btn-stop').attr('disabled', true);
+        // スロットのリール情報を初期化
+        Slot.init();
+    });
+
+    /**
+     * ストップボタンのクリックイベント
+     */
+    $('.btn-stop').click(function () {
+        // ストップボタンを押せないようにする
+        $(this).attr('disabled', true);
+        // レールの回転を停止
+        Slot.stop($(this).attr('data-val'));
+    });
+
+});
+
+
+
+    //     if (random === 0){
+    //         $(".kekka").text("君の負け！");
+    //     }else if (random === 1 ){
+    //         $(".kekka").text("あいこだよ");
+    //     }else if (random === 2 ){
+    //         $(".kekka").text("君の勝ち！");
+    //     }
+
+
+
+
+
+ //画像を押下する
+ //3秒後に止める
+ //その1秒後に結果を出す。
+
+
+
+
+    // const janken_2 = $(".scissors");
+    // janken_2.click(function () {
+    //     var random =Math.floor(Math.random()*3);
+    //     console.log(random,"ランダムな数字");
+
+    //     if (random === 0){
+    //         $(".kekka").text("君の負け！");
+    //     }else if (random === 1 ){
+    //         $(".kekka").text("あいこだよ");
+    //     }else if (random === 2 ){
+    //         $(".kekka").text("君の勝ち！");
+    //     }
+    // });
+
+    // const janken_3 = $(".paper");
+    // janken_3.click(function () {
+    //     var random =Math.floor(Math.random()*3);
+    //     console.log(random,"ランダムな数字");
+
+    //     if (random === 0){
+    //         $(".kekka").text("君の勝ち！");
+    //     }else if (random === 1 ){
+    //         $(".kekka").text("君の負け！");
+    //     }else if (random === 2 ){
+    //         $(".kekka").text("あいこだよ");
+    //     }
+    // });
+
+
+
+    //  clearInterval(timerID);
+    //  setTimeout(function(){
+    //     // ランダム表示を停止
+    //         Slot.stop($(this).attr('data-val'));
+    //     },3000);
+
+
+
+
+// //グー
+// const btn1 = $("#js-btn_1");
+// btn1.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("あいこだよ");
+//     }else if (random === 1 ){
+//         $(".kekka").text("君の勝ち！");
+//     }else if (random === 2 ){
+//         $(".kekka").text("君の負け！");
+//     }
+// });
+
+// //チョキ
+// const btn2 = $("#js-btn_2");
+// btn2.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("あいこだよ");
+//     }else if (random === 1 ){
+//         $(".kekka").text("君の勝ち！");    
+//     }else if (random === 2 ){
+//         $(".kekka").text("君の負け！");    
+//     }
+// });
+
+// //パー
+// const btn3 = $("#js-btn_3");
+// btn3.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("あいこだよ");
+//     }else if (random === 1 ){
+//         $(".kekka").text("君の勝ち！");
+//     }else if (random === 2 ){
+//         $(".kekka").text("君の負け！");
+//     }
+// });
+
+
+//じゃんけん判定
+
+
+//グー出したとき
+// $("#js-btn_1").on("click", function(){
+// var random =Math.floor(Math.random()*3);
+// console.log(random,"ランダムな数字");
+
+// if (random === 0){
+//     $("#js-btn_1").text("あいこだよ");
+//     alert('あいこだよ');
+//     // $("#js-btn_1").css("color","red");
+// }else if (random === 1 ){
+//     $("#js-btn_1").text("君の勝ち！");
+//     alert('君の勝ち！');
+//     // $("#js-btn_1").css("color","black");
+// }else if (random === 2 ){
+//     $("#js-btn_1").text("君の負け！");
+//     alert('君の負け！');
+//     // $("#js-btn_1").css("color","black");
+// }
+
+// $(btn1).on("click", function(){
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+    
+//     if (random === 0){
+//         $("#js-btn_1").text("あいこだよ");
+//         alert('あいこだよ');
+//         // $("#js-btn_1").css("color","red");
+//     }else if (random === 1 ){
+//         $("#js-btn_1").text("君の勝ち！");
+//         alert('君の勝ち！');
+//         // $("#js-btn_1").css("color","black");
+//     }else if (random === 2 ){
+//         $("#js-btn_1").text("君の負け！");
+//         alert('君の負け！');
+//         // $("#js-btn_1").css("color","black");
+//     }
+// })
+// });
+
+
+
+
+
+
+
+// $("input").focusin(function () {
+//     strColor = "lightpink";
+//     console.log("focusin!");
+//     $(this).css("background-color", strColor);
+
+
+// 画像のグーをクリック
+// const janken_1 = $(".rock");
+// janken_1.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("あいこだよ");
+//     }else if (random === 1 ){
+//         $(".kekka").text("君の勝ち！");
+//     }else if (random === 2 ){
+//         $(".kekka").text("君の負け！");
+//     }
+// });
+
+// const janken_2 = $(".scissors");
+// janken_2.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("君の負け！");
+//     }else if (random === 1 ){
+//         $(".kekka").text("あいこだよ");
+//     }else if (random === 2 ){
+//         $(".kekka").text("君の勝ち！");
+//     }
+// });
+
+// const janken_3 = $(".paper");
+// janken_3.click(function () {
+//     var random =Math.floor(Math.random()*3);
+//     console.log(random,"ランダムな数字");
+
+//     if (random === 0){
+//         $(".kekka").text("君の勝ち！");
+//     }else if (random === 1 ){
+//         $(".kekka").text("君の負け！");
+//     }else if (random === 2 ){
+//         $(".kekka").text("あいこだよ");
+//     }
+// });
+
+
+
+
+//  //➀HTMLのimgTestクラスの子の先頭に<img src="">を追加//
+//  $('<img src="" >').prependTo('.imgTest');
+ 
+//  //➁画像のパスを変数に格納//
+//  let jpg1 = "image/fist_01.jpg";
+//  let jpg2 = "image/choki_01.jpg";
+//  let jpg3 = "image/pa_01.jpg";
+
+
+//  //➂画像の配列を作成//
+//  let srcAry = [jpg1, jpg2, jpg3];
+//  console.log(srcAry);
+
+//  //➃ランダム画像を1枚ずつ別の配列に追加格納するために、//
+// //空の配列(最後にこの配列addAry)を表示//  
+//  let addAry = [];
+
+//  //➄jQueryのeachメソッドの繰り返し処理で重複なしのランダムな順番の配列を作成//
+//  $.each(srcAry, function() {
+
+//      //➅配列数だけ整数の乱数を作成し1回ループするごとにspliceメソッドで要素が1つ削除される//
+//      //srcAry.lengthは-1ずつ減る
+//      let rndInt = Math.floor(Math.random() * srcAry.length);
+//      console.log(srcAry[rndInt]);
+
+//      //➆配列addAryの先頭にunshiftメソッドでsrcAryの乱数で作成された要素を追加//
+//      let addAryLength = addAry.unshift(srcAry[rndInt]);
+
+//      //➇spliceメソッドの要素を1つ削除します//
+//      let srcAryLength = srcAry.splice(rndInt, 1);
+//  });
+//  console.log(addAry);
+
+//  //➈ここから画面に表示させていく。serIntervalで0.1秒ごとに画像を入れ替える処理//
+//  let i = 0;
+ 
+// const SIval = setInterval(function() {
+//          // 画像のグーをクリック
+//          const janken_1 = $(".rock");
+//          janken_1.click(function () {
+//              setTimeout(function(){
+//                  // $('.imgTest > img').attr('src', addAry[i]); 
+//                  // clearIntervalで停止
+//                  clearInterval(SIval);
+//                  setTimeout(function(){ 
+//                      if (document.getElementsByID('img_kekka').getAttribute('src') == 'image/fist_01.jpg'){
+//                          $(".kekka").text("あいこだよ");
+//                      }else if ('.imgTest > img' === "image/choki_01.jpg" ){
+//                          $(".kekka").text("君の勝ち！");
+//                      }else if ('.imgTest > img' === "image/pa_01.jpg" ){
+//                          $(".kekka").text("君の負け！");
+//                      }else {
+//                          $(".kekka").text("どれでもないよ");
+//                          console.log(i)
+//                      }
+//                  },2000);
+//                  },1000);
+//          });
+
+//      //➉ifで変数iが配列数とイコールになったら変数iを0に戻し、ランダムに並び替えられた画像の配列を今度は昇順で表示//
+//      if (i === addAry.length) {
+//          i = 0;
+//      }
+
+//      //⑪imgSampleクラスの子要素のimg要素のsrc属性の値をattyメソッドで配列の要素(画像パス)を設定//
+//      $('.imgTest > img').attr('src', addAry[i]); //
+
+//      console.log(i++);
+//  }, 100);
